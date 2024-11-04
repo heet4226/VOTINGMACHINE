@@ -1,0 +1,152 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date: 28.07.2023 14:25:10
+-- Design Name: 
+-- Module Name: VOTINGMACHINE - Behavioral
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.std_logic_unsigned.all;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity VOTINGMACHINE is
+    Port ( clk : in STD_LOGIC;
+           reset : in STD_LOGIC;
+           BJP : in STD_LOGIC;
+           AAP : in STD_LOGIC;
+           CNG : in STD_LOGIC;
+           select_party : in STD_LOGIC;
+           count1_op : out STD_LOGIC_VECTOR (5 downto 0);
+           count2_op : out STD_LOGIC_VECTOR (5 downto 0);
+           count3_op : out STD_LOGIC_VECTOR (5 downto 0));
+end VOTINGMACHINE;
+
+architecture Behavioral of VOTINGMACHINE is
+
+SIGNAL count1,count2,count3 : std_logic_vector(5 downto 0);
+SIGNAL state : std_logic_vector(5 downto 0);
+
+CONSTANT initial : std_logic_vector(5 downto 0) := "000001";
+CONSTANT check : std_logic_vector(5 downto 0) := "000010";
+CONSTANT BJP_state : std_logic_vector(5 downto 0) := "000100";
+CONSTANT AAP_state : std_logic_vector(5 downto 0) := "001000";
+CONSTANT CNG_state : std_logic_vector(5 downto 0) := "010000";
+CONSTANT Done : std_logic_vector(5 downto 0) := "100000";
+
+begin
+
+    process( clk ,reset,BJP,AAP,CNG)
+    
+    begin
+    
+        if (reset ='1') then 
+            count1 <= "000000";       --here "0000000" and others =>'0' are same, other valu che e easy way che 0 batavanu nakar pachi "000000" avu lakhvu pade
+            count2 <= (others =>'0');
+            count3 <= (others =>'0');
+            state <= initial;
+            
+         else 
+            if rising_edge(clk) and reset ='0' then 
+            
+            case state is      
+            
+                when initial =>
+                -- NSL(next state logic)
+                if (BJP ='1' or AAP ='1' or CNG= '1') then
+                    state <= check;
+                else
+                    state <= initial;
+                end if;    
+                 -- OFL(output functional logic) there is no OFL here  
+                when check =>
+                  -- NSL
+                    if (BJP = '1') then
+                        state <= BJP_state;
+                    elsif (AAP = '1') then
+                        state <= AAP_state;
+                    elsif (CNG = '1') then
+                        state <= CNG_state;
+                    else 
+                    state <= check;
+                     end if;
+                    
+                    -- OFL (here also there is no ofl)
+                 
+                  
+                 when BJP_state =>
+                        --NSL
+                        if (select_party ='1') then
+                            state <= done;
+                        else
+                            state <= BJP_state;
+                        end if;
+                     --OFL
+                     if (select_party ='1') then
+                        count1<=count1+'1';
+                        end if;
+                        
+                  when AAP_state => 
+                   --NSL
+                        if (select_party ='1') then
+                            state <= done;
+                        else
+                            state <= AAP_state;
+                        end if;
+                     --OFL
+                     if (select_party ='1') then
+                       count2<=count2+ '1';
+                      end if;
+                     
+                    when CNG_state =>
+                     --NSL
+                        if (select_party ='1') then
+                            state <= done;
+                        else
+                            state <= CNG_state;
+                        end if;
+                     --OFL
+                     if (select_party ='1') then
+                        count3<=count3+1;  
+                        end if;
+                    when done =>
+                        --NSL
+                        state <= initial;
+                     --OFL
+                     
+                     when others =>
+                      state <= initial;    
+                 
+                    end case;
+                 end if;
+             end if;       
+    end process;
+    
+    count1_op <= count1;
+    count2_op <= count2;
+    count3_op <= count3;
+
+
+end Behavioral;
