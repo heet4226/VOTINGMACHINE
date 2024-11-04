@@ -1,0 +1,126 @@
+---------------------------------------------------------------------------------- 
+-- Engineer: Heet Vinodbhai Gadhiya
+-- 
+-- Create Date: 28.07.2023 15:35:58
+-- Module Name: VOTINGMACHINE_tb - Behavioral
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity VOTINGMACHINE_tb is
+--  Port ( );
+end VOTINGMACHINE_tb;
+
+architecture Behavioral of VOTINGMACHINE_tb is
+component VOTINGMACHINE 
+     PORT(clk : in STD_LOGIC;
+           reset : in STD_LOGIC;
+           BJP : in STD_LOGIC;
+           AAP : in STD_LOGIC;
+           CNG : in STD_LOGIC;
+           select_party : in STD_LOGIC;
+           count1_op : out STD_LOGIC_VECTOR (5 downto 0);
+           count2_op : out STD_LOGIC_VECTOR (5 downto 0);
+           count3_op : out STD_LOGIC_VECTOR (5 downto 0)
+);
+
+end component;
+
+SIGNAL clk :STD_LOGIC := '0';
+SIGNAL reset : STD_LOGIC := '0';
+SIGNAL BJP :STD_LOGIC := '0';
+SIGNAL AAP : STD_LOGIC := '0';
+SIGNAL CNG : STD_LOGIC := '0';
+SIGNAL select_party : STD_LOGIC := '0';
+SIGNAL count1_op : STD_LOGIC_VECTOR (5 downto 0) := "000000";
+SIGNAL count2_op : STD_LOGIC_VECTOR (5 downto 0) := "000000";
+SIGNAL count3_op : STD_LOGIC_VECTOR (5 downto 0) := "000000";
+
+constant clk_period : time := 5 ns;
+
+
+
+begin
+
+uut : VOTINGMACHINE
+
+ port map (
+        clk => clk,
+        reset => reset,
+        BJP => BJP,
+        AAP => AAP,
+        CNG => CNG,
+        select_party => select_party,
+        count1_op => count1_op,
+        count2_op => count2_op,
+        count3_op => count3_op
+ );
+ 
+ clk_P : process
+ begin 
+    clk <= '0';
+    wait for clk_period/2;
+    clk <= '1';
+    wait for clk_period/2;
+    
+  end process;
+  
+  stim_P : process
+  
+  begin
+  wait for 50 ns;
+  
+  wait for clk_period*10;
+  reset<='1';
+  wait for 10ns;
+  reset <='0';
+  
+  BJP <= '0';
+  AAP <= '0';
+  CNG <= '0';
+  BJP <= '1';
+  wait for 10 ns;
+  BJP <='0';
+  wait for 10 ns;
+  select_party <='1';
+  wait for 10 ns;
+  select_party <='0';
+  wait for 10 ns;
+  
+  AAP <= '1';
+  wait for 10 ns;
+  AAP <='0';
+  wait for 10 ns;
+  select_party <='1';
+  wait for 10 ns;
+  select_party <='0';
+  wait for 10 ns;
+  
+  CNG <= '1';
+  wait for 10 ns;
+  CNG <='0';
+  wait for 10 ns;
+  select_party <='1';
+  wait for 10 ns;
+  select_party <='0';
+  
+ 
+  wait;
+  end process;
+
+end Behavioral;
